@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Ferramentas da Qualidade</title>
+<style>
+  :root{
+    --petrol:#0E3A43; --teal:#10666F; --teal-soft:#E3EFF0; --bg:#F6F8F8;
+    --ink:#1B2A2E; --muted:#5C7276; --amber:#B87F1E; --amber-soft:#FBF3E2;
+    --alert:#C4453A; --alert-soft:#FDECEA; --ok:#2E7D5B; --ok-soft:#E4F2EC;
+    --card:#FFFFFF; --line:#D8E2E3; --mono:'Consolas','Courier New',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
+  header{background:var(--petrol);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+  header .logo{width:34px;height:34px;border-radius:8px;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  header h1{font-size:15px;font-weight:600}
+  header .sub{font-size:10px;opacity:.7}
+  header .spacer{flex:1}
+  .btn{border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;min-height:44px}
+  .btn:hover{filter:brightness(1.08)}
+  .btn:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+  .btn-primary{background:var(--teal);color:#fff}
+  .btn-ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35)}
+  .btn-light{background:var(--teal-soft);color:var(--petrol)}
+  .btn-danger{background:var(--alert-soft);color:var(--alert)}
+  main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .wrap{max-width:860px;margin:0 auto;padding:20px 16px 40px}
+  .disclaimer{background:var(--amber-soft);border:1px solid #E8D5A8;border-radius:10px;padding:10px 14px;font-size:11.5px;color:#7A5A17;line-height:1.5;margin-bottom:18px}
+  /* ---------- HUB ---------- */
+  .hero{text-align:center;margin:10px 0 22px}
+  .hero h2{font-size:22px;color:var(--petrol)}
+  .hero p{color:var(--muted);font-size:14px;margin-top:6px}
+  .triage{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:22px}
+  .triage h3{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--teal);margin-bottom:12px}
+  .tq{display:flex;flex-direction:column;gap:8px}
+  .tq button{text-align:left;background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;font-size:14px;font-family:inherit;cursor:pointer;min-height:44px}
+  .tq button:hover{border-color:var(--teal);background:var(--teal-soft)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+  .tool-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;transition:transform .12s, box-shadow .12s}
+  .tool-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(14,58,67,.12);border-color:var(--teal)}
+  .tool-card .ic{font-size:26px}
+  .tool-card h4{font-size:14px;color:var(--petrol);margin:8px 0 4px}
+  .tool-card p{font-size:12px;color:var(--muted);line-height:1.45}
+  .section-label{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:22px 0 10px}
+  /* ---------- FERRAMENTA (chat/entrevista) ---------- */
+  .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+  .toolbar h2{font-size:18px;color:var(--petrol);flex:1;min-width:200px}
+  .msgs{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+  .msg{max-width:88%;padding:12px 15px;border-radius:14px;font-size:14px;line-height:1.55;white-space:pre-wrap}
+  .msg.bot{background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px;align-self:flex-start}
+  .msg.bot .who{font-size:10px;font-weight:700;color:var(--teal);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+  .msg.user{background:var(--petrol);color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+  .inputbar{position:sticky;bottom:0;background:var(--bg);padding:10px 0}
+  .inputbar .row{display:flex;gap:8px}
+  textarea,input[type=text],input[type=datetime-local],select{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 14px;font-size:16px;font-family:inherit;resize:none;background:#fff}
+  textarea:focus,input:focus,select:focus{outline:none;border-color:var(--teal)}
+  .choices{display:flex;flex-wrap:wrap;gap:8px}
+  .choice{border:1.5px solid var(--teal);background:#fff;color:var(--teal);border-radius:22px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;min-height:44px}
+  .choice:hover{background:var(--teal);color:#fff}
+  .hint{font-size:11px;color:var(--muted);margin-top:6px}
+  /* ---------- RESULTADOS ---------- */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+  .card h3{font-size:15px;color:var(--petrol);margin-bottom:10px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:var(--teal-soft);color:var(--petrol);font-size:12px}
+  .verdict{border-radius:0 10px 10px 0;padding:14px 16px;font-size:14px;line-height:1.55}
+  .verdict.yes{background:var(--alert-soft);border-left:4px solid var(--alert)}
+  .verdict.no{background:var(--ok-soft);border-left:4px solid var(--ok)}
+  .verdict.warn{background:var(--amber-soft);border-left:4px solid var(--amber)}
+  .why{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;font-size:14px}
+  .why .n{font-family:var(--mono);font-weight:700;color:var(--teal);flex-shrink:0;width:64px}
+  .fish{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+  .bone{background:var(--bg);border-radius:10px;padding:10px}
+  .bone h4{font-size:12px;color:var(--petrol);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+  .bone ul{list-style:none;font-size:12.5px}
+  .bone li{padding:4px 0;border-bottom:1px dashed var(--line)}
+  .bone li:last-child{border:none}
+  .bone .none{color:var(--muted);font-style:italic}
+  .riskmatrix{display:grid;grid-template-columns:auto repeat(3,1fr);gap:3px;font-size:11px;margin-top:10px}
+  .riskmatrix div{padding:8px 6px;text-align:center;border-radius:6px;background:var(--bg)}
+  .riskmatrix .hd{font-weight:700;color:var(--petrol);background:none}
+  .riskmatrix .lo{background:var(--ok-soft);color:var(--ok)}
+  .riskmatrix .md{background:var(--amber-soft);color:var(--amber)}
+  .riskmatrix .hi{background:var(--alert-soft);color:var(--alert)}
+  .riskmatrix .sel{outline:3px solid var(--petrol);font-weight:800}
+  .flow{display:flex;flex-direction:column;align-items:center;gap:0}
+  .fstep{padding:10px 18px;border:2px solid var(--teal);border-radius:8px;background:#fff;font-size:13px;max-width:100%;text-align:center}
+  .fstep.dec{transform:none;border-radius:4px;background:var(--amber-soft);border-color:var(--amber)}
+  .fstep.term{border-radius:22px;background:var(--teal-soft)}
+  .farrow{color:var(--teal);font-size:18px;padding:2px 0}
+  .chk{display:flex;gap:10px;align-items:flex-start;padding:10px;border-bottom:1px dashed var(--line);font-size:14px}
+  .chk input{width:22px;height:22px;flex-shrink:0;margin-top:1px}
+  .actions-print{display:flex;gap:10px;flex-wrap:wrap}
+  /* ---------- IMPRESSÃO ---------- */
+  #report{display:none}
+  @media print{
+    body>*{display:none!important}
+    #report{display:block!important;font-size:12px;color:#000;padding:10px}
+    #report h1{font-size:17px;border-bottom:2px solid #000;padding-bottom:6px;margin-bottom:12px}
+    #report h2{font-size:13px;margin:14px 0 6px;color:#0E3A43}
+    #report table{width:100%;border-collapse:collapse}
+    #report th,#report td{border:1px solid #999;padding:6px 8px;text-align:left;font-size:11px}
+    #report .foot{margin-top:24px;font-size:9px;color:#555}
+    #report .sig{margin-top:46px;display:flex;gap:50px}
+    #report .sig div{border-top:1px solid #000;padding-top:4px;flex:1;text-align:center;font-size:10px}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">⚗️</div>
+  <div>
+    <h1>Ferramentas da Qualidade</h1>
+    <div class="sub">Hub de apoio ao profissional de QA · GMP</div>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn btn-ghost" id="btnHome" style="display:none" onclick="go('')">🏠 Início</button>
+</header>
+
+<main><div class="wrap" id="app"></div></main>
+<div id="report"></div>
+
+<script>
+'use strict';
+/* Diagnóstico visível: erros nunca falham em silêncio */
+window.onerror=function(m,s,l){var b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:0;right:0;background:#C4453A;color:#fff;padding:10px;font-size:12px;z-index:999';b.textContent='Erro: '+m+' (linha '+l+')';document.body.appendChild(b);};
+
+const $=id=>document.getElementById(id);
+const esc=s=>(s==null?'':String(s)).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const DISCLAIMER='⚠️ Ferramenta de apoio, sem caráter oficial ou validado. Serve como guia para aplicação correta das ferramentas da qualidade. As decisões finais são de responsabilidade do usuário, conforme os procedimentos internos da empresa.';
+
+/* =================================================================
+   CATÁLOGO DE FERRAMENTAS
+   Cada ferramenta = { id, icon, name, desc, steps[], result(ans) }
+   step = { id, q, type: text|long|choice|datetime, choices, cond(ans) }
+================================================================= */
+const TOOLS=[
+
+/* ---------- 1. DESVIOS ---------- */
+{id:'desvio',icon:'🔍',name:'Abertura e investigação de desvios',desc:'Entrevista guiada completa: abertura, impacto, linha do tempo, causa raiz e CAPA.',
+steps:[
+ {id:'title',q:'Descreva em uma frase curta o que aconteceu (título do desvio).',type:'text'},
+ {id:'type',q:'Qual categoria melhor descreve o desvio?',type:'choice',choices:['Resultado fora de especificação (OOS)','Falha de processo / equipamento','Desvio de documentação (BPF)','Contaminação / Microbiologia','Desvio de peso / volume','Falha de utilidades','Erro humano / operacional','Outro']},
+ {id:'product',q:'Produto e lote envolvidos (ou "N/A").',type:'text'},
+ {id:'area',q:'Área / setor / equipamento onde foi identificado.',type:'text'},
+ {id:'when',q:'Data e hora da identificação.',type:'datetime'},
+ {id:'who',q:'Quem identificou (nome e função)?',type:'text'},
+ {id:'observed',q:'O que exatamente foi observado? Descreva de forma factual, sem interpretações.',type:'long'},
+ {id:'expected',q:'Qual era a condição esperada? Cite especificação, POP ou faixa.',type:'long'},
+ {id:'evidence',q:'Quais evidências objetivas você possui? (resultados, batch record, fotos, logbooks...)',type:'long'},
+ {id:'containment',q:'Quais ações imediatas de contenção já foram tomadas? (segregação, quarentena...)',type:'long'},
+ {id:'otherLots',q:'Outros lotes, produtos ou equipamentos podem estar afetados?',type:'long'},
+ {id:'distributed',q:'Algum lote potencialmente afetado já foi liberado/distribuído?',type:'choice',choices:['Não — material sob controle','Sim — avaliar recall','Em verificação']},
+ {id:'impact',q:'Avalie o impacto sobre: qualidade do produto, segurança do paciente, integridade de dados e compliance.',type:'long'},
+ {id:'severity',q:'Classificação do desvio:',type:'choice',choices:['Menor','Maior','Crítico']},
+ {id:'why1',q:a=>'Vamos aos 5 Porquês. Por quê nº 1: por que "'+a.title+'" aconteceu?',type:'long'},
+ {id:'why2',q:a=>'Por quê nº 2: e por que "'+cut(a.why1)+'"?',type:'long'},
+ {id:'why3',q:a=>'Por quê nº 3: e por que "'+cut(a.why2)+'"?',type:'long'},
+ {id:'more',q:'Chegamos a uma causa que, se eliminada, evita a recorrência?',type:'choice',choices:['Sim, é a causa raiz','Não, continuar perguntando']},
+ {id:'why4',cond:a=>a.more&&a.more.startsWith('Não'),q:a=>'Por quê nº 4: e por que "'+cut(a.why3)+'"?',type:'long'},
+ {id:'why5',cond:a=>a.more&&a.more.startsWith('Não'),q:a=>'Por quê nº 5: e por que "'+cut(a.why4)+'"?',type:'long'},
+ {id:'root',q:'Formule a CAUSA RAIZ em uma frase objetiva, baseada nas evidências.',type:'long'},
+ {id:'corr',q:'Ações CORRETIVAS (uma por linha, com responsável e prazo se possível).',type:'long'},
+ {id:'prev',q:'Ações PREVENTIVAS (uma por linha).',type:'long'},
+ {id:'eff',q:'Como será verificada a eficácia? (indicador, critério, prazo)',type:'long'},
+ {id:'concl',q:'Conclusão técnica da investigação (impacta ou não a qualidade? justifique).',type:'long'},
+],
+result:a=>{
+ const whys=['why1','why2','why3','why4','why5'].map(k=>a[k]).filter(Boolean);
+ const desc='Em '+fmtDate(a.when)+', '+a.who+' identificou, na área '+a.area+', o seguinte desvio relacionado ao produto '+a.product+': '+a.observed+' A condição esperada era: '+a.expected+' Evidências: '+a.evidence+' Contenção: '+a.containment+' Classificação: '+a.severity+'.';
+ return {title:'Investigação de Desvio — '+a.title,
+ html:'<div class="card"><h3>📄 Descrição do desvio (gerada automaticamente)</h3><p style="line-height:1.7;font-size:14px">'+esc(desc)+'</p></div>'
+ +'<div class="card"><h3>❓ 5 Porquês</h3>'+whys.map((w,i)=>'<div class="why"><span class="n">Por quê '+(i+1)+'</span><span>'+esc(w)+'</span></div>').join('')+'<div class="verdict warn" style="margin-top:8px"><b>Causa raiz:</b> '+esc(a.root)+'</div></div>'
+ +'<div class="card"><h3>🛠️ Plano CAPA</h3><table><tr><th style="width:32%">Corretivas</th><td>'+esc(a.corr).replace(/\n/g,'<br>')+'</td></tr><tr><th>Preventivas</th><td>'+esc(a.prev).replace(/\n/g,'<br>')+'</td></tr><tr><th>Eficácia</th><td>'+esc(a.eff)+'</td></tr></table></div>'
+ +'<div class="card"><h3>✅ Conclusão</h3><p style="font-size:14px;line-height:1.6">'+esc(a.concl)+'</p></div>',
+ print:[['Descrição',desc],['5 Porquês',whys.map((w,i)=>'Por quê '+(i+1)+': '+w).join('\n')],['Causa raiz',a.root],['Ações corretivas',a.corr],['Ações preventivas',a.prev],['Verificação de eficácia',a.eff],['Impacto',a.impact],['Distribuição',a.distributed],['Outros lotes',a.otherLots],['Conclusão técnica',a.concl]]};
+}},
+
+/* ---------- 2. CINCO PORQUÊS ---------- */
+{id:'whys',icon:'❓',name:'Assistente dos Cinco Porquês',desc:'Chegue à causa raiz perguntando "por quê" de forma estruturada e baseada em evidências.',
+steps:[
+ {id:'p',q:'Qual é o problema? Descreva de forma factual e específica.',type:'long'},
+ {id:'w1',q:a=>'Por quê nº 1: por que isso aconteceu?',type:'long'},
+ {id:'w2',q:a=>'Por quê nº 2: e por que "'+cut(a.w1)+'"?',type:'long'},
+ {id:'w3',q:a=>'Por quê nº 3: e por que "'+cut(a.w2)+'"?',type:'long'},
+ {id:'m',q:'A causa atual, se eliminada, evita a recorrência do problema?',type:'choice',choices:['Sim, é a causa raiz','Não, continuar']},
+ {id:'w4',cond:a=>a.m.startsWith('Não'),q:a=>'Por quê nº 4: e por que "'+cut(a.w3)+'"?',type:'long'},
+ {id:'w5',cond:a=>a.m.startsWith('Não'),q:a=>'Por quê nº 5: e por que "'+cut(a.w4)+'"?',type:'long'},
+ {id:'root',q:'Formule a causa raiz em uma frase objetiva.',type:'long'},
+],
+result:a=>{const ws=['w1','w2','w3','w4','w5'].map(k=>a[k]).filter(Boolean);
+ return {title:'Cinco Porquês',
+ html:'<div class="card"><h3>Problema</h3><p style="font-size:14px">'+esc(a.p)+'</p></div><div class="card"><h3>❓ Cadeia dos Porquês</h3>'+ws.map((w,i)=>'<div class="why"><span class="n">Por quê '+(i+1)+'</span><span>'+esc(w)+'</span></div>').join('')+'</div><div class="verdict warn"><b>Causa raiz:</b> '+esc(a.root)+'<br><br><b>💡 Dica do investigador:</b> valide a causa raiz com evidências antes de definir ações. Se a resposta for "erro humano", pergunte mais um porquê — busque o fator sistêmico.</div>',
+ print:[['Problema',a.p]].concat(ws.map((w,i)=>['Por quê '+(i+1),w])).concat([['Causa raiz',a.root]])};
+}},
+
+/* ---------- 3. ISHIKAWA ---------- */
+{id:'ishikawa',icon:'🐟',name:'Gerador de Ishikawa (6M)',desc:'Construa o diagrama espinha de peixe categorizando causas potenciais nos 6M.',
+steps:[
+ {id:'p',q:'Qual é o problema (efeito) a ser analisado? Será a "cabeça do peixe".',type:'long'},
+ {id:'metodo',q:'MÉTODO: causas ligadas a procedimentos, instruções, POPs, parâmetros de processo? Uma por linha (ou "nenhuma").',type:'long'},
+ {id:'maquina',q:'MÁQUINA: causas ligadas a equipamentos, manutenção, calibração, desgaste? Uma por linha.',type:'long'},
+ {id:'mao',q:'MÃO DE OBRA: causas ligadas a treinamento, experiência, fadiga, comunicação? Uma por linha.',type:'long'},
+ {id:'material',q:'MATERIAL: causas ligadas a matéria-prima, insumos, fornecedores, armazenamento? Uma por linha.',type:'long'},
+ {id:'meio',q:'MEIO AMBIENTE: causas ligadas a temperatura, umidade, contaminação, layout, iluminação? Uma por linha.',type:'long'},
+ {id:'medicao',q:'MEDIÇÃO: causas ligadas a instrumentos, métodos analíticos, amostragem, arredondamento? Uma por linha.',type:'long'},
+ {id:'likely',q:'De todas as causas listadas, qual você considera a MAIS PROVÁVEL com base nas evidências atuais?',type:'long'},
+],
+result:a=>{const cats={'Método':a.metodo,'Máquina':a.maquina,'Mão de obra':a.mao,'Material':a.material,'Meio ambiente':a.meio,'Medição':a.medicao};
+ const li=v=>{const items=(v||'').split('\n').map(x=>x.trim()).filter(x=>x&&!/^nenhuma?$/i.test(x));return items.length?items.map(x=>'<li>'+esc(x)+'</li>').join(''):'<li class="none">—</li>';};
+ return {title:'Diagrama de Ishikawa (6M)',
+ html:'<div class="card"><h3>🎯 Efeito (problema)</h3><p style="font-size:14px">'+esc(a.p)+'</p></div><div class="card"><h3>🐟 Espinha de peixe — 6M</h3><div class="fish">'+Object.keys(cats).map(c=>'<div class="bone"><h4>'+c+'</h4><ul>'+li(cats[c])+'</ul></div>').join('')+'</div></div><div class="verdict warn"><b>Causa mais provável:</b> '+esc(a.likely)+'<br><br><b>💡 Próximo passo:</b> confirme com evidências (registros, testes, entrevistas) antes de tratar como causa raiz. Combine com os Cinco Porquês.</div>',
+ print:[['Efeito',a.p]].concat(Object.keys(cats).map(c=>[c,cats[c]||'—'])).concat([['Causa mais provável',a.likely]])};
+}},
+
+/* ---------- 4. 5W2H ---------- */
+{id:'5w2h',icon:'📋',name:'Plano de ação 5W2H',desc:'Estruture ações com O quê, Por quê, Onde, Quando, Quem, Como e Quanto custa.',
+steps:[
+ {id:'obj',q:'Qual é o objetivo geral do plano de ação?',type:'long'},
+ {id:'what',q:'WHAT — O que será feito? Descreva a ação.',type:'long'},
+ {id:'why',q:'WHY — Por que essa ação é necessária?',type:'long'},
+ {id:'where',q:'WHERE — Onde será executada?',type:'text'},
+ {id:'when',q:'WHEN — Quando (prazo ou data-alvo)?',type:'text'},
+ {id:'whoq',q:'WHO — Quem é o responsável?',type:'text'},
+ {id:'how',q:'HOW — Como será executada? Descreva o método.',type:'long'},
+ {id:'much',q:'HOW MUCH — Quanto custará? (recursos, horas, valor — ou "sem custo direto")',type:'text'},
+],
+result:a=>({title:'Plano de Ação 5W2H',
+ html:'<div class="card"><h3>🎯 Objetivo</h3><p style="font-size:14px">'+esc(a.obj)+'</p></div><div class="card"><h3>📋 5W2H</h3><table><tr><th style="width:30%">What (o quê)</th><td>'+esc(a.what)+'</td></tr><tr><th>Why (por quê)</th><td>'+esc(a.why)+'</td></tr><tr><th>Where (onde)</th><td>'+esc(a.where)+'</td></tr><tr><th>When (quando)</th><td>'+esc(a.when)+'</td></tr><tr><th>Who (quem)</th><td>'+esc(a.whoq)+'</td></tr><tr><th>How (como)</th><td>'+esc(a.how)+'</td></tr><tr><th>How much (quanto)</th><td>'+esc(a.much)+'</td></tr></table></div><div class="hint">💡 Para planos com múltiplas ações, execute esta ferramenta uma vez por ação e imprima cada plano.</div>',
+ print:[['Objetivo',a.obj],['What',a.what],['Why',a.why],['Where',a.where],['When',a.when],['Who',a.whoq],['How',a.how],['How much',a.much]]})},
+
+/* ---------- 5. RISCO RÁPIDO ---------- */
+{id:'risco',icon:'⚠️',name:'Avaliação rápida de riscos',desc:'Classifique um risco por Severidade × Probabilidade e receba a recomendação de tratamento.',
+steps:[
+ {id:'r',q:'Descreva o risco / cenário de falha a ser avaliado.',type:'long'},
+ {id:'sev',q:'SEVERIDADE — se o risco se concretizar, qual o pior impacto realista?',type:'choice',choices:['Baixa — sem impacto em qualidade/paciente','Média — impacto em qualidade, detectável antes do paciente','Alta — impacto potencial no paciente ou compliance crítico']},
+ {id:'prob',q:'PROBABILIDADE — com que frequência esse cenário pode ocorrer?',type:'choice',choices:['Baixa — raro, sem histórico','Média — já ocorreu ou pode ocorrer ocasionalmente','Alta — frequente ou muito provável']},
+ {id:'det',q:'DETECTABILIDADE — os controles atuais detectariam a falha antes do impacto?',type:'choice',choices:['Alta — detecção quase certa','Média — detecção possível','Baixa — dificilmente seria detectado']},
+ {id:'ctrl',q:'Quais controles existentes hoje mitigam esse risco?',type:'long'},
+],
+result:a=>{
+ const S={'Baixa':1,'Média':2,'Alta':3}[a.sev.split(' ')[0]];
+ const P={'Baixa':1,'Média':2,'Alta':3}[a.prob.split(' ')[0]];
+ const D={'Alta':1,'Média':2,'Baixa':3}[a.det.split(' ')[0]];
+ const score=S*P, rpn=S*P*D;
+ const cls=score>=6?['hi','ALTO','Ação obrigatória: tratar imediatamente, considerar avaliação formal de risco (FMEA/ICH Q9) e comunicar a Qualidade.']:score>=3?['md','MÉDIO','Tratar com plano de ação priorizado e monitorar. Avaliar necessidade de análise formal.']:['lo','BAIXO','Risco aceitável com os controles atuais. Documentar e monitorar periodicamente.'];
+ let cells='';const lbl=['Baixa','Média','Alta'];
+ cells+='<div class="hd"></div><div class="hd">Prob. Baixa</div><div class="hd">Prob. Média</div><div class="hd">Prob. Alta</div>';
+ for(let s=3;s>=1;s--){cells+='<div class="hd">Sev. '+lbl[s-1]+'</div>';for(let p=1;p<=3;p++){const v=s*p;const c=v>=6?'hi':v>=3?'md':'lo';cells+='<div class="'+c+(s===S&&p===P?' sel':'')+'">'+v+'</div>';}}
+ return {title:'Avaliação Rápida de Riscos',
+ html:'<div class="card"><h3>Risco avaliado</h3><p style="font-size:14px">'+esc(a.r)+'</p></div><div class="card"><h3>Matriz Severidade × Probabilidade</h3><div class="riskmatrix">'+cells+'</div><p class="hint" style="margin-top:8px">Sua avaliação está destacada. RPN (S×P×D) = <b>'+rpn+'</b> de 27.</p></div><div class="verdict '+(cls[0]==='hi'?'yes':cls[0]==='md'?'warn':'no')+'"><b>Risco '+cls[1]+'</b> — '+cls[2]+'<br><br><b>Controles atuais:</b> '+esc(a.ctrl)+'</div><div class="hint">⚠️ Esta é uma triagem inicial. Riscos médios/altos devem seguir a metodologia formal do procedimento interno de gestão de riscos.</div>',
+ print:[['Risco',a.r],['Severidade',a.sev],['Probabilidade',a.prob],['Detectabilidade',a.det],['Score S×P',score+' ('+cls[1]+')'],['RPN (S×P×D)',rpn+' de 27'],['Controles atuais',a.ctrl],['Recomendação',cls[2]]]};
+}},
+
+/* ---------- 6. CONTROLE DE MUDANÇAS ---------- */
+{id:'mudanca',icon:'🔄',name:'Preciso de Controle de Mudanças?',desc:'Árvore de decisão para avaliar se uma atividade exige abertura de Change Control.',
+steps:[
+ {id:'d',q:'Descreva a atividade ou mudança pretendida.',type:'long'},
+ {id:'q1',q:'A atividade altera algum documento GMP aprovado (POP, especificação, batch record, método analítico)?',type:'choice',choices:['Sim','Não']},
+ {id:'q2',q:'Envolve equipamento, sistema computadorizado, utilidade ou instalação qualificada/validada?',type:'choice',choices:['Sim','Não']},
+ {id:'q3',q:'Pode afetar a qualidade, segurança, eficácia, identidade ou pureza do produto?',type:'choice',choices:['Sim','Não','Não sei']},
+ {id:'q4',q:'Altera fornecedor, matéria-prima, material de embalagem ou fabricante aprovado?',type:'choice',choices:['Sim','Não']},
+ {id:'q5',q:'Impacta registro sanitário, dossiê regulatório ou compromissos com autoridades (ANVISA etc.)?',type:'choice',choices:['Sim','Não','Não sei']},
+ {id:'q6',q:'É uma correção pontual idêntica ao estado aprovado (like-for-like), sem alteração de função, material ou parâmetro?',type:'choice',choices:['Sim','Não']},
+],
+result:a=>{
+ const yes=['q1','q2','q3','q4','q5'].filter(k=>a[k]==='Sim');
+ const unsure=['q3','q5'].filter(k=>a[k]==='Não sei');
+ let v,cls;
+ if(yes.length){v='<b>SIM — abra um Controle de Mudanças.</b> A atividade atende a '+yes.length+' critério(s) que caracterizam mudança GMP. Siga o procedimento interno antes de executar qualquer alteração.';cls='yes';}
+ else if(unsure.length){v='<b>AVALIE COM A QUALIDADE.</b> Há pontos sem resposta definitiva ("não sei"). Na dúvida, trate como mudança: consulte a Garantia da Qualidade antes de executar.';cls='warn';}
+ else if(a.q6==='Sim'){v='<b>PROVAVELMENTE NÃO</b> — substituição like-for-like tende a ser gerenciada por manutenção/rotina. Confirme no procedimento interno se like-for-like está isento e registre a atividade adequadamente.';cls='no';}
+ else{v='<b>PROVAVELMENTE NÃO REQUER</b> Controle de Mudanças formal, com base nas respostas. Ainda assim, registre a atividade conforme rotina e, em caso de dúvida, consulte a Qualidade.';cls='no';}
+ const rows=[['Altera documento GMP',a.q1],['Sistema qualificado/validado',a.q2],['Pode afetar qualidade do produto',a.q3],['Altera fornecedor/material',a.q4],['Impacto regulatório',a.q5],['Like-for-like',a.q6]];
+ return {title:'Avaliação — Controle de Mudanças',
+ html:'<div class="card"><h3>Atividade avaliada</h3><p style="font-size:14px">'+esc(a.d)+'</p></div><div class="card"><h3>Critérios avaliados</h3><table>'+rows.map(r=>'<tr><td>'+r[0]+'</td><td style="width:80px;text-align:center;font-weight:700;color:'+(r[1]==='Sim'?'var(--alert)':r[1]==='Não sei'?'var(--amber)':'var(--ok)')+'">'+r[1]+'</td></tr>').join('')+'</table></div><div class="verdict '+cls+'">'+v+'</div>',
+ print:[['Atividade',a.d]].concat(rows).concat([['Resultado',v.replace(/<[^>]+>/g,'')]])};
+}},
+
+/* ---------- 7. AVALIAÇÃO DE IMPACTO ---------- */
+{id:'impacto',icon:'🎯',name:'Avaliação de impacto',desc:'Analise sistematicamente o impacto de um evento sobre produto, paciente, dados e compliance.',
+steps:[
+ {id:'e',q:'Descreva o evento / situação cujo impacto será avaliado.',type:'long'},
+ {id:'iq',q:'QUALIDADE DO PRODUTO: o evento pode afetar atributos de qualidade (teor, pureza, estabilidade, aparência)? Justifique.',type:'long'},
+ {id:'ip',q:'PACIENTE/CONSUMIDOR: existe cenário em que o evento chegue a afetar quem usa o produto? Justifique.',type:'long'},
+ {id:'id',q:'INTEGRIDADE DE DADOS: registros, resultados ou rastreabilidade foram comprometidos? (ALCOA+)',type:'long'},
+ {id:'ir',q:'COMPLIANCE REGULATÓRIO: há impacto em registro, compromissos regulatórios ou requisitos GMP?',type:'long'},
+ {id:'iv',q:'VALIDAÇÃO/QUALIFICAÇÃO: algum estado validado foi afetado?',type:'long'},
+ {id:'g',q:'Considerando tudo, qual o impacto global?',type:'choice',choices:['Sem impacto — justificável tecnicamente','Impacto potencial — requer investigação/ações','Impacto confirmado — ação imediata']},
+],
+result:a=>{const cls=a.g.startsWith('Sem')?'no':a.g.startsWith('Impacto potencial')?'warn':'yes';
+ return {title:'Avaliação de Impacto',
+ html:'<div class="card"><h3>Evento</h3><p style="font-size:14px">'+esc(a.e)+'</p></div><div class="card"><h3>Dimensões avaliadas</h3><table><tr><th style="width:34%">Qualidade do produto</th><td>'+esc(a.iq)+'</td></tr><tr><th>Paciente / consumidor</th><td>'+esc(a.ip)+'</td></tr><tr><th>Integridade de dados</th><td>'+esc(a.id)+'</td></tr><tr><th>Compliance regulatório</th><td>'+esc(a.ir)+'</td></tr><tr><th>Validação / qualificação</th><td>'+esc(a.iv)+'</td></tr></table></div><div class="verdict '+cls+'"><b>Impacto global:</b> '+esc(a.g)+'</div>',
+ print:[['Evento',a.e],['Qualidade do produto',a.iq],['Paciente/consumidor',a.ip],['Integridade de dados',a.id],['Compliance',a.ir],['Validação',a.iv],['Impacto global',a.g]]};
+}},
+
+/* ---------- 8. CAPA ---------- */
+{id:'capa',icon:'🛠️',name:'Auxiliar de definição de CAPA',desc:'Transforme a causa raiz em ações corretivas e preventivas eficazes, com verificação de eficácia.',
+steps:[
+ {id:'root',q:'Qual é a causa raiz confirmada? (Se ainda não tem, use antes os Cinco Porquês ou o Ishikawa.)',type:'long'},
+ {id:'corr',q:'AÇÕES CORRETIVAS: o que eliminará a causa raiz onde o problema ocorreu? Uma por linha. 💡 Evite apenas "retreinamento" — prefira ações sistêmicas (poka-yoke, revisão de POP, redesenho da tarefa, automação de verificação).',type:'long'},
+ {id:'prev',q:'AÇÕES PREVENTIVAS: como evitar o mesmo problema em outros produtos, linhas ou processos similares? Uma por linha.',type:'long'},
+ {id:'resp',q:'Responsáveis e prazos para as ações (um por linha, alinhado às ações acima).',type:'long'},
+ {id:'eff',q:'VERIFICAÇÃO DE EFICÁCIA: qual indicador, critério de aceitação e prazo comprovarão que as ações funcionaram?',type:'long'},
+],
+result:a=>({title:'Plano CAPA',
+ html:'<div class="verdict warn"><b>Causa raiz:</b> '+esc(a.root)+'</div><div class="card" style="margin-top:14px"><h3>🛠️ Plano CAPA</h3><table><tr><th style="width:30%">Corretivas</th><td>'+esc(a.corr).replace(/\n/g,'<br>')+'</td></tr><tr><th>Preventivas</th><td>'+esc(a.prev).replace(/\n/g,'<br>')+'</td></tr><tr><th>Responsáveis / prazos</th><td>'+esc(a.resp).replace(/\n/g,'<br>')+'</td></tr><tr><th>Verificação de eficácia</th><td>'+esc(a.eff)+'</td></tr></table></div><div class="hint">💡 Teste de qualidade do CAPA: se as ações forem 100% implementadas, o problema pode se repetir? Se sim, as ações atacam sintomas — revisite a causa raiz.</div>',
+ print:[['Causa raiz',a.root],['Ações corretivas',a.corr],['Ações preventivas',a.prev],['Responsáveis/prazos',a.resp],['Verificação de eficácia',a.eff]]})},
+
+/* ---------- 9. FLUXOGRAMA ---------- */
+{id:'fluxo',icon:'🗺️',name:'Construtor de fluxogramas',desc:'Mapeie um processo passo a passo e gere o fluxograma automaticamente.',
+steps:[
+ {id:'n',q:'Qual o nome do processo a ser mapeado?',type:'text'},
+ {id:'ini',q:'Qual evento INICIA o processo? (ex.: "Recebimento da amostra")',type:'text'},
+ {id:'steps',q:'Liste as etapas do processo EM ORDEM, uma por linha. Para decisões, comece a linha com "?" (ex.: "? Resultado conforme?").',type:'long'},
+ {id:'fim',q:'Qual evento ENCERRA o processo? (ex.: "Laudo liberado")',type:'text'},
+],
+result:a=>{
+ const items=(a.steps||'').split('\n').map(x=>x.trim()).filter(Boolean);
+ let flow='<div class="fstep term">▶ '+esc(a.ini)+'</div>';
+ items.forEach(s=>{const dec=s.startsWith('?');flow+='<div class="farrow">↓</div><div class="fstep'+(dec?' dec':'')+'">'+(dec?'◆ ':'')+esc(dec?s.slice(1).trim():s)+(dec?' <span class="hint">(Sim ↓ / Não → tratar)</span>':'')+'</div>';});
+ flow+='<div class="farrow">↓</div><div class="fstep term">⏹ '+esc(a.fim)+'</div>';
+ return {title:'Fluxograma — '+a.n,
+ html:'<div class="card"><h3>🗺️ '+esc(a.n)+'</h3><div class="flow">'+flow+'</div></div><div class="hint">💡 Losangos (◆) representam decisões. Para processos complexos com muitos desvios de fluxo, use este mapa como rascunho e finalize no Visio/PowerPoint.</div>',
+ print:[['Processo',a.n],['Início',a.ini],['Etapas',items.join('\n')],['Fim',a.fim]]};
+}},
+
+/* ---------- 10. CHECKLIST DE INVESTIGAÇÃO ---------- */
+{id:'checklist',icon:'✅',name:'Checklist de investigação',desc:'Verifique se a sua investigação de desvio está completa e pronta para revisão da Qualidade.',
+custom:'checklist'},
+];
+
+function cut(t){t=t||'';return t.length>65?t.slice(0,65)+'…':t;}
+function fmtDate(v){if(!v)return '—';try{return new Date(v).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});}catch(e){return v;}}
+
+/* =================================================================
+   TRIAGEM DO HUB — "o que você precisa fazer?"
+================================================================= */
+const TRIAGE=[
+ {q:'Identifiquei um problema durante a produção',t:'desvio'},
+ {q:'Preciso avaliar se uma mudança exige Controle de Mudanças',t:'mudanca'},
+ {q:'Preciso identificar a causa raiz de um problema',t:'whys'},
+ {q:'Quero organizar causas potenciais em um Ishikawa',t:'ishikawa'},
+ {q:'Quero fazer uma avaliação rápida de riscos',t:'risco'},
+ {q:'Preciso avaliar o impacto de um evento',t:'impacto'},
+ {q:'Já tenho a causa raiz e preciso definir o CAPA',t:'capa'},
+ {q:'Preciso criar um plano de ação estruturado',t:'5w2h'},
+ {q:'Quero mapear um processo em fluxograma',t:'fluxo'},
+ {q:'Quero conferir se minha investigação está completa',t:'checklist'},
+];
+
+/* =================================================================
+   MOTOR DE ENTREVISTA GENÉRICO
+================================================================= */
+let session=null; // {tool, ans:{}, idx}
+
+function go(route){location.hash='#/'+route;}
+window.addEventListener('hashchange',render);
+
+function render(){
+ const r=(location.hash||'').replace(/^#\//,'');
+ $('btnHome').style.display=r?'inline-block':'none';
+ if(!r){renderHub();return;}
+ const tool=TOOLS.find(t=>t.id===r);
+ if(!tool){renderHub();return;}
+ if(tool.custom==='checklist'){renderChecklist(tool);return;}
+ session={tool:tool,ans:{},idx:0,log:[]};
+ renderTool();
+ botSay('Olá! Vou conduzi-lo pela ferramenta <b>'+esc(tool.name)+'</b> passo a passo, como faria um profissional sênior de QA. Responda com base em fatos e evidências — se não souber algo, diga "não sei" e siga em frente.');
+ ask();
+}
+
+function renderHub(){
+ $('app').innerHTML=
+  '<div class="disclaimer">'+DISCLAIMER+'</div>'
+ +'<div class="hero"><h2>O que você precisa fazer hoje?</h2><p>Escolha uma situação e o assistente o levará à ferramenta certa — ou navegue pelo catálogo abaixo.</p></div>'
+ +'<div class="triage"><h3>🧭 Assistente de triagem</h3><div class="tq">'+TRIAGE.map(t=>'<button onclick="go(\''+t.t+'\')">'+esc(t.q)+' →</button>').join('')+'</div></div>'
+ +'<div class="section-label">Catálogo de ferramentas</div>'
+ +'<div class="grid">'+TOOLS.map(t=>'<div class="tool-card" role="button" tabindex="0" onclick="go(\''+t.id+'\')" onkeydown="if(event.key===\'Enter\')go(\''+t.id+'\')"><div class="ic">'+t.icon+'</div><h4>'+esc(t.name)+'</h4><p>'+esc(t.desc)+'</p></div>').join('')+'</div>';
+}
+
+function renderTool(){
+ const t=session.tool;
+ $('app').innerHTML=
+  '<div class="toolbar"><h2>'+t.icon+' '+esc(t.name)+'</h2><button class="btn btn-light" onclick="go(\'\')">← Voltar</button></div>'
+ +'<div class="disclaimer">'+DISCLAIMER+'</div>'
+ +'<div class="msgs" id="msgs"></div><div class="inputbar" id="inputbar"></div>';
+}
+
+function botSay(html){$('msgs').insertAdjacentHTML('beforeend','<div class="msg bot"><div class="who">Assistente QA</div>'+html+'</div>');scrollEnd();}
+function userSay(t){$('msgs').insertAdjacentHTML('beforeend','<div class="msg user">'+esc(t)+'</div>');scrollEnd();}
+function scrollEnd(){const m=document.querySelector('main');m.scrollTop=m.scrollHeight;}
+
+function currentStep(){
+ const s=session;
+ while(s.idx<s.tool.steps.length){
+  const st=s.tool.steps[s.idx];
+  if(!st.cond||st.cond(s.ans))return st;
+  s.idx++;
+ }
+ return null;
+}
+
+function ask(){
+ const st=currentStep();
+ if(!st){finish();return;}
+ const q=typeof st.q==='function'?st.q(session.ans):st.q;
+ botSay(esc(q).replace(/\n/g,'<br>'));
+ const bar=$('inputbar');
+ if(st.type==='choice'){
+  bar.innerHTML='<div class="choices">'+st.choices.map((c,i)=>'<button class="choice" data-i="'+i+'">'+esc(c)+'</button>').join('')+'</div>';
+  bar.querySelectorAll('.choice').forEach(b=>b.addEventListener('click',()=>answer(st.choices[+b.dataset.i])));
+ }else if(st.type==='datetime'){
+  bar.innerHTML='<div class="row"><input type="datetime-local" id="inp"><button class="btn btn-primary" id="send">Enviar</button></div>';
+  wire(st);
+ }else if(st.type==='long'){
+  bar.innerHTML='<div class="row"><textarea id="inp" rows="3" placeholder="Digite sua resposta... (Ctrl+Enter envia)"></textarea><button class="btn btn-primary" id="send">Enviar</button></div><div class="hint">Seja factual e baseado em evidências.</div>';
+  wire(st,true);
+ }else{
+  bar.innerHTML='<div class="row"><input type="text" id="inp" placeholder="Digite sua resposta..."><button class="btn btn-primary" id="send">Enviar</button></div>';
+  wire(st);
+ }
+ const inp=$('inp');if(inp)inp.focus();
+}
+function wire(st,isLong){
+ $('send').addEventListener('click',()=>{const v=$('inp').value.trim();if(v)answer(v);});
+ $('inp').addEventListener('keydown',e=>{if(e.key==='Enter'&&(!isLong||e.ctrlKey)){e.preventDefault();const v=$('inp').value.trim();if(v)answer(v);}});
+}
+function answer(v){
+ const st=currentStep();if(!st)return;
+ userSay(v);
+ session.ans[st.id]=v;
+ session.idx++;
+ setTimeout(ask,200);
+}
+
+function finish(){
+ const res=session.tool.result(session.ans);
+ session.res=res;
+ botSay('✅ Concluído! Veja abaixo o resultado gerado automaticamente.');
+ $('msgs').insertAdjacentHTML('beforeend',res.html
+ +'<div class="card actions-print"><button class="btn btn-primary" onclick="printResult()">🖨️ Gerar PDF</button><button class="btn btn-light" onclick="render()">↺ Refazer</button><button class="btn btn-light" onclick="go(\'\')">🏠 Início</button></div>');
+ $('inputbar').innerHTML='';
+ scrollEnd();
+}
+
+function printResult(){
+ const r=session.res;
+ $('report').innerHTML='<h1>'+esc(r.title)+'</h1><table>'+r.print.map(row=>'<tr><th style="width:26%">'+esc(row[0])+'</th><td>'+esc(row[1]||'—').replace(/\n/g,'<br>')+'</td></tr>').join('')+'</table>'
+ +'<div class="sig"><div>Elaborado por — data</div><div>Revisado por — data</div></div>'
+ +'<div class="foot">'+DISCLAIMER+' Documento gerado pelo workspace Ferramentas da Qualidade em '+new Date().toLocaleString('pt-BR')+'.</div>';
+ window.print();
+}
+
+/* =================================================================
+   CHECKLIST DE INVESTIGAÇÃO (módulo custom)
+================================================================= */
+const CHECK_ITEMS=[
+ 'O desvio possui título claro e descrição factual (o quê, onde, quando, quem)?',
+ 'A condição esperada foi documentada com referência (POP, especificação, faixa)?',
+ 'Evidências objetivas foram anexadas/listadas (registros, resultados, fotos)?',
+ 'Ações imediatas de contenção foram registradas com data/hora?',
+ 'Outros lotes/produtos potencialmente afetados foram avaliados?',
+ 'A situação de material distribuído foi verificada?',
+ 'A linha do tempo dos eventos foi reconstruída?',
+ 'A avaliação de impacto cobre produto, paciente, dados e compliance?',
+ 'A classificação (menor/maior/crítico) está justificada?',
+ 'A causa raiz foi investigada com ferramenta estruturada (5 Porquês / Ishikawa)?',
+ 'A causa raiz é sistêmica (não termina em "erro humano" sem análise dos fatores)?',
+ 'As ações corretivas eliminam a causa raiz (não apenas sintomas)?',
+ 'Há ações preventivas para processos/produtos similares?',
+ 'Cada ação tem responsável e prazo definidos?',
+ 'A verificação de eficácia tem indicador, critério e prazo?',
+ 'A conclusão técnica está fundamentada nas evidências?',
+];
+function renderChecklist(tool){
+ $('app').innerHTML=
+  '<div class="toolbar"><h2>'+tool.icon+' '+esc(tool.name)+'</h2><button class="btn btn-light" onclick="go(\'\')">← Voltar</button></div>'
+ +'<div class="disclaimer">'+DISCLAIMER+'</div>'
+ +'<div class="card"><h3>Marque o que já está completo na sua investigação</h3>'
+ +CHECK_ITEMS.map((c,i)=>'<label class="chk"><input type="checkbox" data-i="'+i+'" onchange="chkUpdate()"> <span>'+esc(c)+'</span></label>').join('')
+ +'</div><div class="card" id="chkResult"></div>';
+ chkUpdate();
+}
+function chkUpdate(){
+ const boxes=[...document.querySelectorAll('.chk input')];
+ const done=boxes.filter(b=>b.checked).length,total=boxes.length;
+ const pct=Math.round(done/total*100);
+ const missing=boxes.filter(b=>!b.checked).map(b=>CHECK_ITEMS[+b.dataset.i]);
+ const cls=pct===100?'no':pct>=70?'warn':'yes';
+ $('chkResult').innerHTML='<div class="verdict '+cls+'"><b>'+done+' de '+total+' itens ('+pct+'%).</b> '
+ +(pct===100?'Investigação pronta para revisão da Qualidade! 🎉':'Itens pendentes antes de enviar para revisão:<br>'+missing.map(m=>'• '+esc(m)).join('<br>'))+'</div>';
+}
+
+/* Inicialização */
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',render);}else{render();}
+</script>
+</body>
+</html>
